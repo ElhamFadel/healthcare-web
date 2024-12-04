@@ -42,7 +42,7 @@ const LoginPage = () => {
         </form>
         <div className="mt-4 text-center">
           <Link href="/register">
-            <span className="text-blue-500">Don't have an account? Register</span>
+            <span className="text-blue-500">Don&apos;t have an account? Register</span>
           </Link>
         </div>
       </div>
