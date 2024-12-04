@@ -8,7 +8,7 @@ export default function Patients() {
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-semibold text-gray-800 mb-4">Patients of Dr. John Doe</h1>
-      <p className="text-lg mb-6">Here is the list of patients you're currently following.</p>
+      <p className="text-lg mb-6">Here is the list of patients you&apos;re currently following.</p>
 
       {/* Example patient */}
       <div className="bg-white p-6 rounded-lg shadow-md mb-4">

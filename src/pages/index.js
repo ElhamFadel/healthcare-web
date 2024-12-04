@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import localFont from "next/font/local";
 import Link from "next/link";
 
@@ -56,17 +57,17 @@ export default function Home() {
           <div className="flex justify-center space-x-12">
             {/* Testimonial 1 */}
             <div className="bg-white p-8 rounded-lg shadow-lg max-w-xs">
-              <p className="text-lg mb-4">"This app has made managing my healthcare so much easier. I can book appointments and access my documents anytime."</p>
+              <p className="text-lg mb-4">&quot;This app has made managing my healthcare so much easier. I can book appointments and access my documents anytime.&quot;</p>
               <p className="font-semibold text-gray-700">John Doe</p>
             </div>
             {/* Testimonial 2 */}
             <div className="bg-white p-8 rounded-lg shadow-lg max-w-xs">
-              <p className="text-lg mb-4">"I love how easy it is to find a doctor based on my needs. The app is very user-friendly."</p>
+              <p className="text-lg mb-4">&quot;I love how easy it is to find a doctor based on my needs. The app is very user-friendly.&quot;</p>
               <p className="font-semibold text-gray-700">Jane Smith</p>
             </div>
             {/* Testimonial 3 */}
             <div className="bg-white p-8 rounded-lg shadow-lg max-w-xs">
-              <p className="text-lg mb-4">"I feel secure knowing my medical records are stored safely in the cloud, and I can share them with my doctor instantly."</p>
+              <p className="text-lg mb-4">&quot;I feel secure knowing my medical records are stored safely in the cloud, and I can share them with my doctor instantly.&quot;</p>
               <p className="font-semibold text-gray-700">Mary Johnson</p>
             </div>
           </div>
