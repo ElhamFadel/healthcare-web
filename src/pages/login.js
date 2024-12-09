@@ -1,14 +1,26 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-
+import useAuthActions from '@/context/useAuthActions';
 
 const LoginPage = () => {
+  const { user } = useAuth(); 
+  const { login, error } = useAuthActions(); 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false); 
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
+    try {
+      await login(email, password); 
+      setLoading(false);
+    } catch (err) {
+      console.error(err.message);
+      setLoading(false);
+    }
   };
 
   return (
@@ -38,10 +50,15 @@ const LoginPage = () => {
               required
             />
           </div>
-          <button type="submit" className="w-full p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-            Login
+          <button 
+            type="submit" 
+            className={`w-full p-2 text-white rounded-lg ${loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}`} 
+            disabled={loading}
+          >
+            {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
+        {error && <p className="mt-4 text-red-500 text-center">{error}</p>}
         <div className="mt-4 text-center">
           <Link href="/register">
             <span className="text-blue-500">Don&apos;t have an account? Register</span>
