@@ -1,59 +1,55 @@
 import { useState } from 'react';
 import { useAuth } from './AuthContext'; 
 import { useRouter } from 'next/router';
-import firebase from 'firebase/app';
-import { auth,signInWithEmailAndPassword } from '../../firebase';
-import 'firebase/auth';
-
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, auth } from '../../firebase';
+import checkIfDoctor from '@/utils/checkIsDoctor';
 const useAuthActions = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const { setUser, setIsAuthenticated } = useAuth(); 
+  const { state, dispatch } = useAuth();
+  const { loading, error, user, isAuthenticated } = state;
   const router = useRouter();
 
   const login = async (email, password) => {
-    setLoading(true);
+    dispatch({ type: 'SET_LOADING', payload: true });
     try {
-      console.log("auhhhhhhhhh")
-      const userCredential = await signInWithEmailAndPassword(auth,email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      setUser(user); 
-      setIsAuthenticated(true); 
-      
-      router.push(`/doctor/${user.uid}`); 
+      dispatch({ type: 'SET_USER', payload: user });
+      if(checkIfDoctor(email))
+      router.push(`/doctor/${user.uid}`);
+     router.push(`/patient/${user.uid}`);
     } catch (error) {
-      setError(error.message);
+      dispatch({ type: 'SET_ERROR', payload: error.message });
     } finally {
-      setLoading(false);
+      dispatch({ type: 'SET_LOADING', payload: false });
     }
   };
 
   const logout = async () => {
-    setLoading(true);
+    dispatch({ type: 'SET_LOADING', payload: true });
     try {
-      await firebase.auth().signOut();
-      setUser(null); 
-      setIsAuthenticated(false);
+      await auth.signOut();
+      dispatch({ type: 'REMOVE_USER' });
       router.push('/login'); 
     } catch (error) {
-      setError(error.message);
+      dispatch({ type: 'SET_ERROR', payload: error.message });
     } finally {
-      setLoading(false);
+      dispatch({ type: 'SET_LOADING', payload: false });
     }
   };
 
   const register = async (email, password) => {
-    setLoading(true);
+    dispatch({ type: 'SET_LOADING', payload: true });
     try {
-      const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      setUser(user); 
-      setIsAuthenticated(true);
-      router.push('/dashboard'); 
+      dispatch({ type: 'SET_USER', payload: user });
+      if(checkIfDoctor(email))
+        router.push(`/doctor/${user.uid}`);
+       router.push(`/patient/${user.uid}`);  
     } catch (error) {
-      setError(error.message);
+      dispatch({ type: 'SET_ERROR', payload: error.message });
     } finally {
-      setLoading(false);
+      dispatch({ type: 'SET_LOADING', payload: false });
     }
   };
 
@@ -62,7 +58,9 @@ const useAuthActions = () => {
     logout,
     register,
     loading,
-    error
+    error,
+    user,
+    isAuthenticated
   };
 };
 

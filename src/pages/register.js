@@ -1,14 +1,22 @@
 import { useState } from 'react';
 import Link from 'next/link';
+import  useAuthActions  from '@/context/useAuthActions';
 
 const RegisterPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  
+  // Get auth actions
+  const { register, loading, error } = useAuthActions();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Check if passwords match
     if (password === confirmPassword) {
+      // Call the register function from useAuthActions
+      await register(email, password);
     } else {
       alert("Passwords do not match");
     }
@@ -52,10 +60,15 @@ const RegisterPage = () => {
               required
             />
           </div>
-          <button type="submit" className="w-full p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-            Register
+          <button 
+            type="submit" 
+            className={`w-full p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={loading}
+          >
+            {loading ? 'Registering...' : 'Register'}
           </button>
         </form>
+        {error && <p className="text-red-500 text-center mt-4">{error}</p>}
         <div className="mt-4 text-center">
           <Link href="/login">
             <span className="text-blue-500">Already have an account? Login</span>
