@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { useAuth } from './AuthContext'; 
 import { useRouter } from 'next/router';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, auth } from '../../firebase';
-import checkIfDoctor from '@/utils/checkIsDoctor';
+import { doc, setDoc } from "firebase/firestore"; 
+import { db } from '../../firebase';   
+
 const useAuthActions = () => {
   const { state, dispatch } = useAuth();
   const { loading, error, user, isAuthenticated } = state;
@@ -14,9 +16,14 @@ const useAuthActions = () => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       dispatch({ type: 'SET_USER', payload: user });
-      if(checkIfDoctor(email))
-      router.push(`/doctor/${user.uid}`);
-     router.push(`/patient/${user.uid}`);
+      const userRef = doc(db, 'users', user.uid); 
+      await setDoc(userRef, { email: user.email, lastLogin: new Date() }, { merge: true });
+
+      if (state.typeUser.role) {
+        router.push(`/doctor/${user.uid}`);
+      } else {
+        router.push(`/patient/${user.uid}`);
+      }
     } catch (error) {
       dispatch({ type: 'SET_ERROR', payload: error.message });
     } finally {
@@ -29,7 +36,7 @@ const useAuthActions = () => {
     try {
       await auth.signOut();
       dispatch({ type: 'REMOVE_USER' });
-      router.push('/login'); 
+      router.push('/login');
     } catch (error) {
       dispatch({ type: 'SET_ERROR', payload: error.message });
     } finally {
@@ -37,15 +44,34 @@ const useAuthActions = () => {
     }
   };
 
-  const register = async (email, password) => {
+  const register = async (email, password, formData) => {
+    console.log(email,"email")
+    console.log("step3")
     dispatch({ type: 'SET_LOADING', payload: true });
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      console.log(userCredential,"usercred")
       const user = userCredential.user;
       dispatch({ type: 'SET_USER', payload: user });
-      if(checkIfDoctor(email))
+      console.log("step2")
+      const userRef = doc(db, 'users', user.uid); 
+      console.log(userRef,"userref")
+      await setDoc(userRef, {
+        email: user.email,
+        name: formData.name,
+        age: formData.age,
+        phone: formData.phone,
+        healthStatus: formData.healthStatus,
+        specialty: formData.specialty || '',
+        role: state.typeUser?.role,   
+        lastLogin: new Date()
+      });
+      console.log("I'm here")
+      if ( formData.typeUser.role === 'doctor') {
         router.push(`/doctor/${user.uid}`);
-       router.push(`/patient/${user.uid}`);  
+      } else {
+        router.push(`/patient/${user.uid}`);
+      }
     } catch (error) {
       dispatch({ type: 'SET_ERROR', payload: error.message });
     } finally {
