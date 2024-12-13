@@ -1,13 +1,13 @@
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import {useAuth} from "@/context/AuthContext"
+import UserAuth from '@/utils/UserAuth';
 
 export default function PatientDashboard() {
   const router = useRouter();
   const { state, dispatch } = useAuth();
   const {user} = state;
   const { id } = router.query; 
-
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-semibold text-gray-800 mb-4">Welcome, {user?.name}</h1>
