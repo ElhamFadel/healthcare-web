@@ -2,7 +2,7 @@ import { createContext, useReducer, useContext } from 'react';
 
 
 const initialState = {
-  typeUser:null,
+  typeUser:'',
   user: null,
   isAuthenticated: false,
   loading: false,
@@ -36,7 +36,7 @@ const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
-export const AuthProvider = ({ children }) => {
+export  const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   return (

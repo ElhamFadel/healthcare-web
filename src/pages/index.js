@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
-
+import Image from "next/image";
 export default function Home() {
   const { dispatch } = useAuth();
   const router = useRouter();
@@ -34,9 +34,11 @@ export default function Home() {
         </div>
 
         <div className="flex justify-center">
-          <img
+          <Image
             src={imageSrc}
             alt="Selected"
+            width={300}
+            height = {300}
             className="w-32 h-32 rounded-full border-4 border-gray-300 shadow-md"
           />
         </div>
