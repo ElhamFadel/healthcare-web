@@ -1,12 +1,15 @@
 import { createContext, useReducer, useContext } from 'react';
 
+
 const initialState = {
+  typeUser:'',
   user: null,
   isAuthenticated: false,
   loading: false,
   error: null,
 };
 const actionTypes = {
+ SET_TYPE_USER:'SET_TYPE_USER',
   SET_USER: 'SET_USER',
   REMOVE_USER: 'REMOVE_USER',
   SET_LOADING: 'SET_LOADING',
@@ -15,6 +18,8 @@ const actionTypes = {
 
 const authReducer = (state, action) => {
   switch (action.type) {
+    case actionTypes.SET_TYPE_USER:
+      return { ...state, typeUser: action.payload };
     case actionTypes.SET_USER:
       return { ...state, user: action.payload, isAuthenticated: true };
     case actionTypes.REMOVE_USER:
@@ -31,7 +36,7 @@ const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
-export const AuthProvider = ({ children }) => {
+export  const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   return (
