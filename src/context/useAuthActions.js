@@ -3,7 +3,8 @@ import { useAuth } from './AuthContext';
 import { useRouter } from 'next/router';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, auth } from '../../firebase';
 import { doc, setDoc } from "firebase/firestore"; 
-import { db } from '../../firebase';   
+import { db } from '../../firebase';  
+import UserAuth from '@/utils/UserAuth'; 
 
 const useAuthActions = () => {
   const { state, dispatch } = useAuth();
@@ -15,17 +16,12 @@ const useAuthActions = () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      
-      const token = await user.getIdToken();
-
-      localStorage.setItem("token", token);
-
       dispatch({ type: 'SET_USER', payload: user });
 
       const userRef = doc(db, 'users', user.uid); 
-      console.log(user.uid, "userid");
       await setDoc(userRef, { email: user.email, lastLogin: new Date() }, { merge: true });
-
+      const token = await user.getIdToken();
+      UserAuth.setToken(token);
       if (state.typeUser.role === 'doctor') {
         router.push(`/doctor/${user.uid}`);
       } else {
@@ -36,23 +32,15 @@ const useAuthActions = () => {
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false });
     }
+    return token;
   };
 
   const register = async (email, password, formData) => {
-    console.log(email, "email");
-    console.log("step3");
     dispatch({ type: 'SET_LOADING', payload: true });
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-
-      const token = await user.getIdToken();
-      console.log("Token:", token);
-
-      localStorage.setItem("token", token);
-
       dispatch({ type: 'SET_USER', payload: { ...user, ...formData } });
-      console.log("step2");
       const userRef = doc(db, 'users', user.uid); 
       await setDoc(userRef, {
         email: user.email,
@@ -64,6 +52,10 @@ const useAuthActions = () => {
         role: state?.typeUser?.role,   
         lastLogin: new Date()
       });
+
+      const token = await user.getIdToken();
+      UserAuth.setToken(token);
+      
       if (state.typeUser?.role === 'doctor') {
         router.push(`/doctor/${user.uid}`);
       } else {
@@ -74,12 +66,14 @@ const useAuthActions = () => {
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false });
     }
+    return token;
   };
 
   const logout = async () => {
     dispatch({ type: 'SET_LOADING', payload: true });
     try {
       await auth.signOut();
+      UserAuth.clearToken();
       localStorage.removeItem("token");
       dispatch({ type: 'REMOVE_USER' });
       router.push('/');
