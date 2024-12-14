@@ -6,7 +6,8 @@ export default function DoctorDashboard() {
   const router = useRouter();
   const { id } = router.query;
    const { state, dispatch } = useAuth();
-   const {user} =state;
+   const {user} =state.user;
+
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-semibold text-gray-800 mb-4">Welcome Dr.{user?.name}</h1>

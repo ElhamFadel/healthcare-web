@@ -8,6 +8,7 @@ export default function PatientDashboard() {
   const { state, dispatch } = useAuth();
   const {user} = state;
   const { id } = router.query; 
+  console.log(user,"user",state,"state");
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-semibold text-gray-800 mb-4">Welcome, {user?.name}</h1>

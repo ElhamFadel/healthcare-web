@@ -1,5 +1,10 @@
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { createContext, useReducer, useContext } from 'react';
-
+import { doc, getDoc } from 'firebase/firestore';
+import UserAuth from '@/utils/UserAuth';
+import { onAuthStateChanged } from "firebase/auth";
+import { auth,db } from "../../firebase";
 
 const initialState = {
   typeUser:'',
@@ -38,6 +43,35 @@ export const useAuth = () => useContext(AuthContext);
 
 export  const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
+  const router = useRouter();
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async(currentUser) => {
+      if (currentUser) {        
+        try {
+          const userRef = doc(db, 'users', currentUser.uid);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            dispatch({
+                    type: "SET_USER",
+                    payload: {
+                    user: userSnap.data(),
+                    },
+                  });;
+          } else {
+            console.error('No such user document!');
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      } else {
+        dispatch({
+          type: "REMOVE_USER"
+        });
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <AuthContext.Provider value={{ state, dispatch }}>
